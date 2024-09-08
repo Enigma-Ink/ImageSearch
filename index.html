@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Web Image Search</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Web Image Search</h1>
+    <div class="container">
+        <div class="search-box">
+            <input type="text" id="searchQuery" placeholder="Search images..." onkeypress="handleKeyPress(event)">
+            <button onclick="fetchImages()">Search</button>
+        </div>
+        <div class="image-results" id="imageResults"></div>
+    </div>
+
+    <script>
+        const apiKey = "Cw9wQCWRvjl50yWwdkBIoZ9ozIqz6gFZRY8WFFUg5mNt89iWMqPAjRTa";  // Your Pexels API key
+        const pexelsApiUrl = "https://api.pexels.com/v1/search";  // Pexels API endpoint
+
+        // Trigger search when pressing "Enter"
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                fetchImages();
+            }
+        }
+
+        async function fetchImages() {
+            const query = document.getElementById("searchQuery").value;
+            if (!query) return alert("Please enter a search query");
+
+            try {
+                const response = await fetch(`${pexelsApiUrl}?query=${encodeURIComponent(query)}`, {
+                    headers: {
+                        Authorization: apiKey
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch images");
+                }
+
+                const data = await response.json();
+                displayImages(data.photos);
+            } catch (error) {
+                console.error("Error fetching images:", error);
+            }
+        }
+
+        function displayImages(images) {
+            const imageResults = document.getElementById("imageResults");
+            imageResults.innerHTML = "";  // Clear previous results
+            images.forEach(image => {
+                const imgElement = document.createElement("img");
+                imgElement.src = image.src.medium;
+                imgElement.alt = image.alt;
+                imageResults.appendChild(imgElement);
+            });
+        }
+    </script>
+</body>
+</html>
